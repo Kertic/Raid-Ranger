@@ -9,7 +9,7 @@ namespace Code.Player
 
         public void Launch(Vector2 velocity, Vector2 position)
         {
-            var launchedBullet = Instantiate(bullet.GetComponent<Bullet>(), position, Quaternion.identity);
+            Bullet launchedBullet = Instantiate(bullet.GetComponent<Bullet>(), position, Quaternion.identity);
             launchedBullet.Spawn(velocity);
         }
     }

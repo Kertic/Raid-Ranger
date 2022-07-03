@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -6,24 +5,25 @@ namespace Code.Objects
 {
     public class Bullet : MonoBehaviour
     {
-        private Vector2 _direction;
         [SerializeField] private float speed;
-        private float _lifespan;
         [SerializeField] private float maxLifespan;
+        private float _lifespan;
+        private Vector2 _direction;
+        [SerializeField] protected int damage;
 
-        private void Start()
+        void FixedUpdate()
         {
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            transform.position += (Vector3)_direction;
+            transform.Translate(_direction);
             _lifespan += Time.deltaTime;
             if (_lifespan > maxLifespan)
             {
                 Destroy(gameObject);
             }
+        }
+
+        public int GetDamage()
+        {
+            return damage;
         }
 
         public void Spawn(Vector2 startingDirection)

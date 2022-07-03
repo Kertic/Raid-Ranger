@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace Code.CameraCode
@@ -9,10 +8,7 @@ namespace Code.CameraCode
         [SerializeField] private float zoomSpeed;
         [SerializeField] private float lerpPace; 
 
-        // Start is called before the first frame update
-        void Start()
-        {
-        }
+
 
         private void Update()
         {
@@ -22,20 +18,13 @@ namespace Code.CameraCode
             }
         }
 
-        // Update is called once per frame
         void FixedUpdate()
         {
-            Vector3 delta = player.position - transform.position;
-            Vector3 deltalerp = Vector3.Lerp(transform.position, player.position, Time.deltaTime * lerpPace);
-            delta.z = 0; // Don't change the Z
-            deltalerp.z = transform.position.z; // Don't change the Z
-            transform.position = deltalerp;
-//            MoveCam(deltalerp);
-        }
-
-        void MoveCam(Vector3 delta)
-        {
-            transform.position += delta;
+            Vector3 position = transform.position;
+            Vector3 deltalerp = Vector3.Lerp(position, player.position, Time.deltaTime * lerpPace);
+            deltalerp.z = position.z; // Don't change the Z
+            position = deltalerp;
+            transform.position = position;
         }
     }
 }

@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - PlayerBullet
   layers:
   - Default
   - TransparentFX
@@ -49,4 +50,7 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 2012772585
+    locked: 0
+  - name: FloatingUI
+    uniqueID: 2430797187
     locked: 0

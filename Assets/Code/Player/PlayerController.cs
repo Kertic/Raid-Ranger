@@ -1,14 +1,15 @@
 using System;
-using Unity.VisualScripting;
+using Interfaces;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Code.Player
 {
-    public class PlayerController : MonoBehaviour
+    public class PlayerController : MonoBehaviour, IEntity
     {
         [SerializeField] private float moveSpeed;
         [SerializeField] private BulletLauncher bulletLauncher;
+        [SerializeField] private int maxHealth;
+        private int _currentHealth;
 
         private Vector2 _movement;
         private Camera _camera;
@@ -16,6 +17,7 @@ namespace Code.Player
         private void Start()
         {
             _camera = Camera.main;
+            _currentHealth = maxHealth;
         }
 
         void FixedUpdate()
@@ -25,7 +27,7 @@ namespace Code.Player
             Vector3 position = transform.position;
             if (Input.GetButton("Fire1"))
             {
-                bulletLauncher.Launch(Input.mousePosition - Camera.main.WorldToScreenPoint(position), position);
+                bulletLauncher.Launch(Input.mousePosition - _camera.WorldToScreenPoint(position), position);
             }
         }
 
@@ -51,7 +53,6 @@ namespace Code.Player
             {
                 AddMovementDirection(Vector2.down);
             }
-            Debug.Log(_movement.normalized * moveSpeed);
 
             transform.position += (Vector3)_movement.normalized * moveSpeed;
         }
@@ -68,6 +69,21 @@ namespace Code.Player
                 var position = transform.position;
                 Gizmos.DrawLine(position, Input.mousePosition - _camera.WorldToScreenPoint(position));
             }
+        }
+
+        int IEntity.GetCurrentHealth()
+        {
+            return _currentHealth;
+        }
+
+        int IEntity.GetMaxHealth()
+        {
+            return maxHealth;
+        }
+
+        void IEntity.TakeDamage(int damage)
+        {
+            _currentHealth -= Math.Min(_currentHealth, damage);
         }
     }
 }
