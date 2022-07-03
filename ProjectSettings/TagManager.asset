@@ -41,3 +41,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Floor
+    uniqueID: 547365585
+    locked: 0
+  - name: Projectiles
+    uniqueID: 4265074621
+    locked: 0
+  - name: Player
+    uniqueID: 2012772585
+    locked: 0

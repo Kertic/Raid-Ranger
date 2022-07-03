@@ -29,7 +29,6 @@ namespace Code.Objects
         public void Spawn(Vector2 startingDirection)
         {
             _direction = startingDirection.normalized * speed;
-            Debug.Log("I've been spawned with direction " + _direction);
         }
     }
 }

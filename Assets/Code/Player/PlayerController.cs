@@ -11,15 +11,21 @@ namespace Code.Player
         [SerializeField] private BulletLauncher bulletLauncher;
 
         private Vector2 _movement;
+        private Camera _camera;
+
+        private void Start()
+        {
+            _camera = Camera.main;
+        }
 
         void FixedUpdate()
         {
             ApplyMovement();
 
+            Vector3 position = transform.position;
             if (Input.GetButton("Fire1"))
             {
-                var position = transform.position;
-                bulletLauncher.Launch(Input.mousePosition - Camera.main.WorldToScreenPoint(position),position);
+                bulletLauncher.Launch(Input.mousePosition - Camera.main.WorldToScreenPoint(position), position);
             }
         }
 
@@ -45,6 +51,7 @@ namespace Code.Player
             {
                 AddMovementDirection(Vector2.down);
             }
+            Debug.Log(_movement.normalized * moveSpeed);
 
             transform.position += (Vector3)_movement.normalized * moveSpeed;
         }
@@ -56,8 +63,11 @@ namespace Code.Player
 
         private void OnDrawGizmosSelected()
         {
-            var position = transform.position;
-            Gizmos.DrawLine(position,Input.mousePosition -  Camera.main.WorldToScreenPoint(position));
+            if (Application.isPlaying)
+            {
+                var position = transform.position;
+                Gizmos.DrawLine(position, Input.mousePosition - _camera.WorldToScreenPoint(position));
+            }
         }
     }
 }
