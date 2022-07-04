@@ -181,12 +181,35 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "WASD to move\n\nLeft click to shoot\n\nYou'll be kiting around a red imp
-    while the raid defeats the main boss. \n\nThe boss's healthbar is at the top,
-    and it will go down over time as the \"Raiders\" attack it.\n\nThe imp has no
-    health and cannot die, but has an aggro meter. If it runs out, it will attempt
-    to run back to the boss and heal it a bit before attacking you again.\n\nShoot
-    the imp to maintain aggro.\n\nGodspeed Ranger.\n"
+  m_text: 'WASD to move
+
+
+    Left click to shoot
+
+
+    The boss''s healthbar is
+    at the top. It''s impervious to your physical attacks, but the "raid mages" are
+    casting a circle of protection. This keeps you safe from the purple void, and
+    also damages the boss.
+
+
+    However, the boss has a lacky. The imp can heal
+    him, and doesn''t take damage from the magic circle. However, he does get angry
+    when you shoot him.
+
+
+    The imp has no health and cannot die, but has an aggro
+    meter. If it runs out, it will attempt to run back to the boss and heal it a
+    bit before attacking you again.
+
+
+    Shoot the imp to maintain aggro.
+
+
+    Godspeed
+    Ranger.
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -213,7 +236,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 17.25
+  m_fontSize: 14.9
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
