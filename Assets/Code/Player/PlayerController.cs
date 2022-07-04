@@ -1,4 +1,5 @@
 using System;
+using Code.UI;
 using Interfaces;
 using UnityEngine;
 
@@ -6,24 +7,25 @@ namespace Code.Player
 {
     public class PlayerController : MonoBehaviour, IEntity
     {
-        [SerializeField] private float moveSpeed;
-        [SerializeField] private float shootingSpeedModifier;
-        [SerializeField] private BulletLauncher bulletLauncher;
-        [SerializeField] private int maxHealth;
-        [SerializeField] private float cooldown;
+        [Header("Classes")] [SerializeField] private BulletLauncher bulletLauncher;
+        [SerializeField] private FloatingHealthBar playerHealthBar;
 
-        private float _cooldownHeat;
+        [Header("PlayerVariables")] [SerializeField]
+        private int maxHealth;
+
+        [SerializeField] private float moveSpeed, shootingSpeedModifier, cooldown, redFlashDuration;
+
+        private float _cooldownHeat, _initialMoveSpeed, _redFlashTimeRemaining;
         private int _currentHealth;
         private Vector2 _movement;
         private Camera _camera;
-        private float _initialMoveSpeed;
+        private static readonly int Damaged = Animator.StringToHash("Damaged");
 
         private void Start()
         {
             _camera = Camera.main;
             _currentHealth = maxHealth;
             _initialMoveSpeed = moveSpeed;
-
             _cooldownHeat = 0;
         }
 
@@ -39,7 +41,6 @@ namespace Code.Player
                 }
             }
 
-
             if (_cooldownHeat > 0)
             {
                 moveSpeed = _initialMoveSpeed * shootingSpeedModifier;
@@ -48,6 +49,14 @@ namespace Code.Player
             else
             {
                 moveSpeed = _initialMoveSpeed;
+            }
+
+            if (_redFlashTimeRemaining > 0)
+            {
+                _redFlashTimeRemaining -= Time.deltaTime;
+                if (_redFlashTimeRemaining <= 0)
+                {
+                }
             }
 
             ApplyMovement();
@@ -84,14 +93,6 @@ namespace Code.Player
             _movement += motion;
         }
 
-        private void OnDrawGizmosSelected()
-        {
-            if (Application.isPlaying)
-            {
-                var position = transform.position;
-                Gizmos.DrawLine(position, Input.mousePosition - _camera.WorldToScreenPoint(position));
-            }
-        }
 
         int IEntity.GetCurrentHealth()
         {
@@ -105,7 +106,22 @@ namespace Code.Player
 
         void IEntity.TakeDamage(int damage)
         {
-            _currentHealth -= Math.Min(_currentHealth, damage);
+            if (_redFlashTimeRemaining <= 0)
+            {
+                _currentHealth -= Math.Min(_currentHealth, damage);
+                playerHealthBar.UpdateHealthPercent(_currentHealth / (float)maxHealth);
+                _redFlashTimeRemaining = redFlashDuration;
+                GetComponent<Animator>().SetTrigger(Damaged);
+            }
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            if (Application.isPlaying)
+            {
+                var position = transform.position;
+                Gizmos.DrawLine(position, Input.mousePosition - _camera.WorldToScreenPoint(position));
+            }
         }
     }
 }

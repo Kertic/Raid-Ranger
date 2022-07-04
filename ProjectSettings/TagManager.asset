@@ -51,6 +51,9 @@ TagManager:
   - name: Player
     uniqueID: 2012772585
     locked: 0
+  - name: Entities
+    uniqueID: 1885301723
+    locked: 0
   - name: FloatingUI
     uniqueID: 2430797187
     locked: 0

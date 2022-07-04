@@ -24,7 +24,7 @@ namespace Code.UI
         {
             if (percent > 1 || percent < 0)
             {
-                Math.Clamp(percent, 0, 1);
+                percent = Math.Clamp(percent, 0, 1);
             }
 
             scalingGraphic.localScale = Vector3.Scale(new Vector3(percent, 1, 1), scalingGraphic.localScale);

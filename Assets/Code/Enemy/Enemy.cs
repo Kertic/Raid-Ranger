@@ -37,10 +37,13 @@ namespace Code.Enemy
             return maxHealth;
         }
 
-        void IEntity.TakeDamage(int damage)
+        public virtual void TakeDamage(int damage)
         {
             _currentHealth -= Math.Min(_currentHealth, damage);
-            myHealth.UpdateHealthPercent((float)_currentHealth / (float) maxHealth);
+            if (myHealth != null)
+            {
+                myHealth.UpdateHealthPercent((float)_currentHealth / (float)maxHealth);
+            }
         }
     }
 }
