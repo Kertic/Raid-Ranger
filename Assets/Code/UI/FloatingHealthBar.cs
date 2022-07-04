@@ -1,5 +1,6 @@
 using System;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Code.UI
@@ -27,7 +28,9 @@ namespace Code.UI
                 percent = Math.Clamp(percent, 0, 1);
             }
 
-            scalingGraphic.localScale = Vector3.Scale(new Vector3(percent, 1, 1), scalingGraphic.localScale);
+            Vector3 localScale = scalingGraphic.localScale;
+            localScale = new Vector3(percent, localScale.y, localScale.z);
+            scalingGraphic.localScale = localScale;
         }
     }
 }

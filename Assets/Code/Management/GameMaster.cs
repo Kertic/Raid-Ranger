@@ -11,7 +11,7 @@ namespace Code.Management
         [SerializeField] private float arenaExtents;
         [SerializeField] private PlayerController player;
         [SerializeField] private float bossTimer;
-        [SerializeField] private CanvasTimerBar timerBar;
+        [SerializeField] private RectTransformHealthBar timerBar;
         [SerializeField] private float environmentDamage;
         private float _elapsedTime;
         
@@ -28,7 +28,7 @@ namespace Code.Management
         private void FixedUpdate()
         {
             _elapsedTime += Time.deltaTime;
-            timerBar.UpdateHealthPercent( 1.0f - (_elapsedTime / bossTimer));
+            timerBar.UpdateFillPercent( 1.0f - (_elapsedTime / bossTimer));
             float distanceFromCenter = Vector3.Distance(player.transform.position, Vector3.zero);
             if (distanceFromCenter > arenaExtents)
             {

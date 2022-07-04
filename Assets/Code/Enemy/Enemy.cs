@@ -8,8 +8,11 @@ namespace Code.Enemy
 {
     public class Enemy : MonoBehaviour, IEntity
     {
-        [SerializeField] private FloatingHealthBar myHealth;
-        [SerializeField] private int maxHealth;
+        [Header("Classes")] [SerializeField] protected FloatingHealthBar myHealth;
+
+        [Header("EnemyVariables")] [SerializeField]
+        private int maxHealth;
+
         private int _currentHealth;
 
         private void OnTriggerEnter2D(Collider2D col)

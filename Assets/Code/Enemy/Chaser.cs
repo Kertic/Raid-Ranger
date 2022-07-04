@@ -1,15 +1,23 @@
 using System;
 using Code.Management;
 using Code.Player;
+using Code.UI;
 using Interfaces;
 using UnityEngine;
 using UnityEngine.Networking.PlayerConnection;
 
 namespace Code.Enemy
 {
-    public class Chaser : Enemy, IEntity
+    public class Chaser : Enemy
     {
-        [SerializeField] private float maxAggro, aggroCooldownRate, moveSpeed;
+        [SerializeField] [Header("ExtraChaserClasses")]
+        private FloatingHealthBar aggroBar;
+
+        [SerializeField] [Header("ChaserVariables")]
+        private float maxAggro;
+
+        [SerializeField] private float aggroCooldownRate, moveSpeed;
+
         private PlayerController _player;
         private float _aggro;
 
@@ -28,10 +36,10 @@ namespace Code.Enemy
                 _aggro -= aggroCooldownRate;
 
                 MoveToPlayer();
+                aggroBar.UpdateHealthPercent((_aggro / maxAggro));
             }
         }
 
-        
 
         void MoveToPlayer()
         {
