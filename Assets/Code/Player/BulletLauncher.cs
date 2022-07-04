@@ -5,11 +5,11 @@ namespace Code.Player
 {
     public class BulletLauncher : MonoBehaviour
     {
-        [SerializeField] private GameObject bullet;
+        [SerializeField] private GameObject bulletPrefab;
 
         public void Launch(Vector2 velocity, Vector2 position)
         {
-            Bullet launchedBullet = Instantiate(bullet.GetComponent<Bullet>(), position, Quaternion.identity);
+            Bullet launchedBullet = Instantiate(bulletPrefab.GetComponent<Bullet>(), position, Quaternion.identity);
             launchedBullet.Spawn(velocity);
         }
     }

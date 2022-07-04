@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Code.Objects
 {
@@ -29,6 +28,12 @@ namespace Code.Objects
         public void Spawn(Vector2 startingDirection)
         {
             _direction = startingDirection.normalized * speed;
+        }
+
+        //This function is able to be invoked when a bullet hits an entity
+        public void OnHitTarget(Collider2D collidingObject)
+        {
+            Destroy(gameObject);
         }
     }
 }

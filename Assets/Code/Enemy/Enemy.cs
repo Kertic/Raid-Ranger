@@ -18,6 +18,7 @@ namespace Code.Enemy
             {
                 Bullet collidingBullet = col.gameObject.GetComponent<Bullet>();
                 ((IEntity)this).TakeDamage(collidingBullet.GetDamage());
+                collidingBullet.OnHitTarget(GetComponent<Collider2D>());
             }
         }
 
@@ -39,7 +40,6 @@ namespace Code.Enemy
         void IEntity.TakeDamage(int damage)
         {
             _currentHealth -= Math.Min(_currentHealth, damage);
-            Debug.Log("My hp is: " + _currentHealth);
             myHealth.UpdateHealthPercent((float)_currentHealth / (float) maxHealth);
         }
     }

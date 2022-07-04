@@ -7,28 +7,50 @@ namespace Code.Player
     public class PlayerController : MonoBehaviour, IEntity
     {
         [SerializeField] private float moveSpeed;
+        [SerializeField] private float shootingSpeedModifier;
         [SerializeField] private BulletLauncher bulletLauncher;
         [SerializeField] private int maxHealth;
-        private int _currentHealth;
+        [SerializeField] private float cooldown;
 
+        private float _cooldownHeat;
+        private int _currentHealth;
         private Vector2 _movement;
         private Camera _camera;
+        private float _initialMoveSpeed;
 
         private void Start()
         {
             _camera = Camera.main;
             _currentHealth = maxHealth;
+            _initialMoveSpeed = moveSpeed;
+
+            _cooldownHeat = 0;
         }
 
         void FixedUpdate()
         {
-            ApplyMovement();
-
             Vector3 position = transform.position;
             if (Input.GetButton("Fire1"))
             {
-                bulletLauncher.Launch(Input.mousePosition - _camera.WorldToScreenPoint(position), position);
+                if (_cooldownHeat <= 0)
+                {
+                    bulletLauncher.Launch(Input.mousePosition - _camera.WorldToScreenPoint(position), position);
+                    _cooldownHeat = cooldown;
+                }
             }
+
+
+            if (_cooldownHeat > 0)
+            {
+                moveSpeed = _initialMoveSpeed * shootingSpeedModifier;
+                _cooldownHeat -= Time.deltaTime;
+            }
+            else
+            {
+                moveSpeed = _initialMoveSpeed;
+            }
+
+            ApplyMovement();
         }
 
         private void ApplyMovement()
