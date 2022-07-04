@@ -1,4 +1,5 @@
 using System;
+using Code.Management;
 using Code.UI;
 using Interfaces;
 using UnityEngine;
@@ -19,6 +20,7 @@ namespace Code.Player
         private int _currentHealth;
         private Vector2 _movement;
         private Camera _camera;
+        private Animator _animator;
         private static readonly int Damaged = Animator.StringToHash("Damaged");
 
         private void Start()
@@ -27,6 +29,7 @@ namespace Code.Player
             _currentHealth = maxHealth;
             _initialMoveSpeed = moveSpeed;
             _cooldownHeat = 0;
+            _animator = GetComponent<Animator>();
         }
 
         void FixedUpdate()
@@ -104,14 +107,18 @@ namespace Code.Player
             return maxHealth;
         }
 
-        void IEntity.TakeDamage(int damage)
+        public void TakeDamage(int damage)
         {
             if (_redFlashTimeRemaining <= 0)
             {
                 _currentHealth -= Math.Min(_currentHealth, damage);
                 playerHealthBar.UpdateHealthPercent(_currentHealth / (float)maxHealth);
                 _redFlashTimeRemaining = redFlashDuration;
-                GetComponent<Animator>().SetTrigger(Damaged);
+                _animator.SetTrigger(Damaged);
+                if (_currentHealth == 0)
+                {
+                    GameMaster.Instance.Death();
+                }
             }
         }
 

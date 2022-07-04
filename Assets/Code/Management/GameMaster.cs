@@ -3,6 +3,7 @@ using Code.Player;
 using Code.UI;
 using Interfaces;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Code.Management
 {
@@ -12,9 +13,10 @@ namespace Code.Management
         [SerializeField] private PlayerController player;
         [SerializeField] private float bossTimer;
         [SerializeField] private RectTransformHealthBar timerBar;
-        [SerializeField] private float environmentDamage;
+        [SerializeField] private int environmentDamage;
+        [SerializeField] private GameObject deathScreen;
         private float _elapsedTime;
-        
+
         public static GameMaster Instance;
 
         void Awake()
@@ -23,12 +25,21 @@ namespace Code.Management
             {
                 Instance = this;
             }
+
+            deathScreen.SetActive(false);
+            Time.timeScale = 1;
         }
 
         private void FixedUpdate()
         {
             _elapsedTime += Time.deltaTime;
-            timerBar.UpdateFillPercent( 1.0f - (_elapsedTime / bossTimer));
+            if (_elapsedTime >= bossTimer)
+            {
+                SceneManager.LoadScene("End Screen");
+                return;
+            }
+
+            timerBar.UpdateFillPercent(1.0f - (_elapsedTime / bossTimer));
             float distanceFromCenter = Vector3.Distance(player.transform.position, Vector3.zero);
             if (distanceFromCenter > arenaExtents)
             {
@@ -36,6 +47,17 @@ namespace Code.Management
             }
         }
 
+        public void HealBoss(float percentOfHealthGainedBack)
+        {
+            float healthValue = percentOfHealthGainedBack * bossTimer;
+            _elapsedTime = Math.Max(_elapsedTime - healthValue, 0.0f);
+        }
+
+        public void Death()
+        {
+            Time.timeScale = 0;
+            deathScreen.SetActive(true);
+        }
 
         public PlayerController GetPlayer()
         {
@@ -44,9 +66,9 @@ namespace Code.Management
 
         void PlayerOutOfBounds()
         {
-            ((IEntity)player).TakeDamage(10);
+            ((IEntity)player).TakeDamage(environmentDamage);
         }
-        
+
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.yellow;

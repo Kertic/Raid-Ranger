@@ -15,7 +15,7 @@ namespace Code.Enemy
 
         private int _currentHealth;
 
-        private void OnTriggerEnter2D(Collider2D col)
+        protected virtual void OnTriggerEnter2D(Collider2D col)
         {
             if (col.gameObject.CompareTag("PlayerBullet"))
             {
