@@ -1,5 +1,6 @@
 using System;
 using Code.Management;
+using Code.Player.Skills;
 using Code.UI;
 using Interfaces;
 using UnityEngine;
@@ -10,15 +11,17 @@ namespace Code.Player
     {
         [Header("Classes")] [SerializeField] private BulletLauncher bulletLauncher;
         [SerializeField] private FloatingHealthBar playerHealthBar;
+        [SerializeField] private SkillsetSO _skills;
+        [SerializeField] private int[] cooldowns;
 
         [Header("PlayerVariables")] [SerializeField]
         private int maxHealth;
 
         [SerializeField] private float moveSpeed, shootingSpeedModifier, cooldown, redFlashDuration;
 
-        private float _cooldownHeat, _initialMoveSpeed, _redFlashTimeRemaining;
+        private float _cooldownHeat, _initialMoveSpeed, _redFlashTimeRemaining, _dashSpeed;
         private int _currentHealth;
-        private Vector2 _movement;
+        private Vector2 _movement, _dash;
         private Camera _camera;
         private Animator _animator;
         private static readonly int Damaged = Animator.StringToHash("Damaged");
@@ -28,6 +31,7 @@ namespace Code.Player
             _camera = Camera.main;
             _currentHealth = maxHealth;
             _initialMoveSpeed = moveSpeed;
+            _dashSpeed = moveSpeed;
             _cooldownHeat = 0;
             _animator = GetComponent<Animator>();
         }
@@ -35,13 +39,19 @@ namespace Code.Player
         void FixedUpdate()
         {
             Vector3 position = transform.position;
-            if (Input.GetButton("Fire1"))
+            if (Input.GetButton("Fire"))
             {
                 if (_cooldownHeat <= 0)
                 {
                     bulletLauncher.Launch(Input.mousePosition - _camera.WorldToScreenPoint(position), position);
                     _cooldownHeat = cooldown;
                 }
+            }
+
+            for (int i = 0; i < _skills.GetSkills().Length; i++)
+            {
+                if (Input.GetButton("Skill" + i))
+                    _skills.GetSkills()[i].ExecuteSkill(this);
             }
 
             if (_cooldownHeat > 0)
@@ -67,35 +77,43 @@ namespace Code.Player
 
         private void ApplyMovement()
         {
-            _movement = Vector2.zero;
-            if (Input.GetAxis("up") > 0)
+            if (_dash != Vector2.zero)
             {
-                AddMovementDirection(Vector2.right);
+                
+                transform.position += (Vector3)_dash.normalized * _dashSpeed;// TODO: Figure out a way to satisfy what you intuitively know as a dash, where you pick a direction and move forward some amount rapidly that way
+                
             }
-
-            if (Input.GetAxis("up") < 0)
+            else
             {
-                AddMovementDirection(Vector2.left);
-            }
+                _movement = Vector2.zero;
+                if (Input.GetAxis("up") > 0)
+                {
+                    AddMovementDirection(Vector2.right);
+                }
 
-            if (Input.GetAxis("right") > 0)
-            {
-                AddMovementDirection(Vector2.up);
-            }
+                if (Input.GetAxis("up") < 0)
+                {
+                    AddMovementDirection(Vector2.left);
+                }
 
-            if (Input.GetAxis("right") < 0)
-            {
-                AddMovementDirection(Vector2.down);
-            }
+                if (Input.GetAxis("right") > 0)
+                {
+                    AddMovementDirection(Vector2.up);
+                }
 
-            transform.position += (Vector3)_movement.normalized * moveSpeed;
+                if (Input.GetAxis("right") < 0)
+                {
+                    AddMovementDirection(Vector2.down);
+                }
+
+                transform.position += (Vector3)_movement.normalized * moveSpeed;
+            }
         }
 
-        void AddMovementDirection(Vector2 motion)
+        private void AddMovementDirection(Vector2 motion)
         {
             _movement += motion;
         }
-
 
         int IEntity.GetCurrentHealth()
         {
@@ -120,6 +138,14 @@ namespace Code.Player
                     GameMaster.Instance.Death();
                 }
             }
+        }
+
+        public PlayerController Dash(Vector2 dashDirection, float movespeedMultiplier)
+        {
+            _dash = dashDirection;
+            _dashSpeed = moveSpeed * movespeedMultiplier;
+
+            return this;
         }
 
         private void OnDrawGizmosSelected()
