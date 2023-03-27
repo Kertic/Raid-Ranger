@@ -7,10 +7,11 @@ namespace Code.Player
     {
         [SerializeField] private GameObject bulletPrefab;
 
-        public void Launch(Vector2 velocity, Vector2 position)
+        public void Launch(Vector2 direction, Vector2 position)
         {
+            //TODO: Refactor this into an object pool instead of instantiating them all dynamically 
             Bullet launchedBullet = Instantiate(bulletPrefab.GetComponent<Bullet>(), position, Quaternion.identity);
-            launchedBullet.Spawn(velocity);
+            launchedBullet.Spawn(direction);
         }
     }
 }

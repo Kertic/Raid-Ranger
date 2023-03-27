@@ -455,10 +455,11 @@ MonoBehaviour:
   bulletLauncher: {fileID: 205546541}
   playerHealthBar: {fileID: 2084760448}
   maxHealth: 100
-  moveSpeed: 0.05
+  moveSpeed: 2.5
   shootingSpeedModifier: 0.5
   cooldown: 0.4
   redFlashDuration: 1
+  dashSpeed: 5
 --- !u!4 &205546539
 Transform:
   m_ObjectHideFlags: 0
@@ -1296,7 +1297,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arenaExtents: 10
   player: {fileID: 205546538}
-  bossTimer: 90
+  bossTimer: 900
   timerBar: {fileID: 464066773}
   environmentDamage: 10
   deathScreen: {fileID: 1470292236}

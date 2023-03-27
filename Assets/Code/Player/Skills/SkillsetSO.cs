@@ -1,19 +1,19 @@
-using System.Collections;
 using System.Collections.Generic;
-using Code.Player.Skills;
 using UnityEngine;
 
-
-[CreateAssetMenu(fileName = "SkillsetName", menuName = "ScriptableObjects/Skillset", order = 1)]
-public class SkillsetSO : ScriptableObject
+namespace Code.Player.Skills
 {
-    [SerializeReference] private SkillAbstract skill1;
-    public SkillAbstract skill2;
-    public SkillAbstract skill3;
-    public SkillAbstract skill4;
-
-    public SkillAbstract[] GetSkills()
+    [CreateAssetMenu(fileName = "SkillsetName", menuName = "ScriptableObjects/Skillset", order = 1)]
+    public class SkillsetSo : ScriptableObject
     {
-        return new[] { skill1, skill2, skill3, skill4 };
+        [SerializeField] private Skill skill1;
+        public Skill skill2;
+        public Skill skill3;
+        public Skill skill4;
+
+        public Skill[] GetSkills()
+        {
+            return new[] { skill1, skill2, skill3, skill4 };
+        }
     }
 }

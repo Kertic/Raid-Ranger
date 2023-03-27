@@ -12,3 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 863ea25a94eb1b540999b54efc062f7a, type: 3}
   m_Name: BasicSkillset
   m_EditorClassIdentifier: 
+  skill1: {fileID: 0}
+  skill2: {fileID: 0}
+  skill3: {fileID: 0}
+  skill4: {fileID: 0}

@@ -72,7 +72,6 @@ namespace Code.Enemy
         {
             base.TakeDamage(damage);
             _aggro = Math.Min(damage + _aggro, maxAggro);
-            Debug.Log("My Aggro is at: " + _aggro);
         }
 
 

@@ -69,6 +69,11 @@ namespace Code.Management
             ((IEntity)player).TakeDamage(environmentDamage);
         }
 
+        public void Pause()
+        {
+            Debug.Break();
+        }
+
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.yellow;
