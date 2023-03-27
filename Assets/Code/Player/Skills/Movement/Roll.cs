@@ -2,20 +2,20 @@ using UnityEngine;
 
 namespace Code.Player.Skills.Movement
 {
-    public class Roll : MonoBehaviour
+    [CreateAssetMenu(fileName = "Roll", menuName = "ScriptableObjects/Skill/Roll", order = 1)]
+    public class Roll : Skill
     {
-        public void PlayerRoll(float dashSpeed)
-        {
-            PlayerController playerController = PlayerController.Instance;
-            
-            if (playerController == null)
-            {
-                return;
-            }
+        [SerializeField]
+        private float dashSpeed;
 
-            Vector3 destinationDirection = playerController.MouseWorldPosition - playerController.transform.position;
-            Vector3 destinationPoint = destinationDirection.normalized * playerController.InitialMoveSpeed;
-            playerController.TravelToPoint(destinationPoint + playerController.transform.position, 1.0f / dashSpeed);
+        public override void Execute(PlayerController playerController)
+        {
+            Vector3 position = playerController.transform.position;
+            Vector3 destinationDirection = playerController.PlayerMovement.WalkingMovement;
+            Vector3 destinationPoint = destinationDirection.normalized * playerController.PlayerMovement.InitialMoveSpeed;
+            playerController.PlayerMovement.TravelToPoint(destinationPoint + position, 1.0f / dashSpeed);
         }
+
+        public override void Cleanup(PlayerController playerController) { }
     }
 }

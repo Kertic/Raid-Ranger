@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 863ea25a94eb1b540999b54efc062f7a, type: 3}
   m_Name: BasicSkillSet
   m_EditorClassIdentifier: 
-  skill1: {fileID: 11400000, guid: 6a4903d3fef115742ae2a79b3d6f7f04, type: 2}
-  skill2: {fileID: 0}
-  skill3: {fileID: 0}
-  skill4: {fileID: 0}
+  primarySkill: {fileID: 11400000, guid: aafca3c45da5d574a8340a5176db595a, type: 2}
+  secondarySkill: {fileID: 0}
+  movementSkill: {fileID: 11400000, guid: 01293cf13f0b8b446ab66070b62044e1, type: 2}
+  ultimateSkill: {fileID: 0}

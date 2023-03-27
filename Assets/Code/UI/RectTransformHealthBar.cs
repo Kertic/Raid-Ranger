@@ -5,8 +5,11 @@ namespace Code.UI
 {
     public class RectTransformHealthBar : MonoBehaviour
     {
-        [SerializeField] private Transform healthBackground;
-        [SerializeField] private Transform scalingGraphic;
+        [SerializeField]
+        private Transform healthBackground;
+
+        [SerializeField]
+        private Transform scalingGraphic;
 
         private RectTransform _healthBackground;
         private RectTransform _scalingGraphic;
@@ -21,9 +24,7 @@ namespace Code.UI
         }
 
         // Update is called once per frame
-        void Update()
-        {
-        }
+        void Update() { }
 
         public void UpdateFillPercent(float percent)
         {

@@ -58,3 +58,6 @@ TagManager:
   - name: FloatingUI
     uniqueID: 2430797187
     locked: 0
+  - name: HudUI
+    uniqueID: 2542078949
+    locked: 0
