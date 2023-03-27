@@ -1,10 +1,10 @@
 using UnityEngine;
 
-namespace Code.Player.Skills
+namespace Code.Player.Skills.Movement
 {
-    public class Roll
+    public class Roll : MonoBehaviour
     {
-        public static void PlayerRoll(float dashSpeed)
+        public void PlayerRoll(float dashSpeed)
         {
             PlayerController playerController = PlayerController.Instance;
             

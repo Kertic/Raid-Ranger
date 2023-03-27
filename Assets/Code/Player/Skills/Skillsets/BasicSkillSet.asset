@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 863ea25a94eb1b540999b54efc062f7a, type: 3}
-  m_Name: BasicSkillset
+  m_Name: BasicSkillSet
   m_EditorClassIdentifier: 
-  skill1: {fileID: 0}
+  skill1: {fileID: 11400000, guid: 6a4903d3fef115742ae2a79b3d6f7f04, type: 2}
   skill2: {fileID: 0}
   skill3: {fileID: 0}
   skill4: {fileID: 0}

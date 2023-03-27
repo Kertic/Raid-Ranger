@@ -10,21 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4aaeeda870d47db43a815d2df1f1a811, type: 3}
-  m_Name: SkillName
+  m_Name: RollSkill
   m_EditorClassIdentifier: 
   icon: {fileID: 0}
   execute:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
+      - m_Target: {fileID: 4490381968978164632, guid: 6db80fc6ffd54fb41b546ff5ddab2dde, type: 3}
+        m_TargetAssemblyTypeName: Code.Player.Skills.Roll, Assembly-CSharp
+        m_MethodName: PlayerRoll
+        m_Mode: 4
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
-          m_FloatArgument: 0
+          m_FloatArgument: 5
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  cooldown: 1
+  lastExecutedTime: 0

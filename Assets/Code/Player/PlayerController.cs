@@ -2,6 +2,7 @@
 
 using System;
 using Code.Management;
+using Code.Player.Skills.Skillsets;
 using Code.UI;
 using Interfaces;
 using UnityEngine;
@@ -22,13 +23,22 @@ namespace Code.Player
 
         public static PlayerController Instance { get; private set; }
 
-        [Header("Classes")] [SerializeField] private BulletLauncher bulletLauncher;
-        [SerializeField] private FloatingHealthBar playerHealthBar;
+        [Header("Classes")]
+        [SerializeField]
+        private BulletLauncher bulletLauncher;
 
-        [Header("PlayerVariables")] [SerializeField]
+        [SerializeField]
+        private FloatingHealthBar playerHealthBar;
+
+        [SerializeField]
+        private SkillSet skills;
+
+        [Header("PlayerVariables")]
+        [SerializeField]
         private int maxHealth;
 
-        [SerializeField] private float moveSpeed,
+        [SerializeField]
+        private float moveSpeed,
             shootingSpeedModifier,
             cooldown, //TODO: Cooldown should probably stem from the weapon, not the player. Not every weapon is like that.
             redFlashDuration,
@@ -52,11 +62,6 @@ namespace Code.Player
             {
                 Instance = this;
             }
-        }
-
-        public static void DelMe(string msg)
-        {
-            Debug.Log(msg);
         }
 
         private void Start()
@@ -86,9 +91,7 @@ namespace Code.Player
 
             if (Input.GetButtonDown("Fire2"))
             {
-                Vector3 destinationDirection = MouseWorldPosition - position;
-                Vector3 destinationPoint = destinationDirection.normalized * InitialMoveSpeed;
-                TravelToPoint(destinationPoint + position, 1.0f / dashSpeed);
+                skills.GetSkills()[0].Execute();
             }
         }
 
