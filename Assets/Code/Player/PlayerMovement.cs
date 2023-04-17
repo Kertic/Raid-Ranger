@@ -1,3 +1,4 @@
+using Code.Management;
 using UnityEngine;
 
 namespace Code.Player
@@ -20,11 +21,13 @@ namespace Code.Player
         private void Start()
         {
             InitialMoveSpeed = moveSpeed;
-            PlayerController.PlayerUpdate += PlayerMovementUpdate;
+            PlayerController.PlayerFixedUpdate += PlayerMovementUpdate;
         }
 
         private void ApplyPhysics()
         {
+            if (GameMaster.Instance.IsPaused) return;
+            
             if (_forcedMovement != Vector2.zero)
             {
                 Vector2 normalizedForcedMovement = _forcedMovement.normalized * (_forcedMoveSpeed * Time.deltaTime);

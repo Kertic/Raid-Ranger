@@ -6,25 +6,16 @@ namespace Code.UI
     public class RectTransformHealthBar : MonoBehaviour
     {
         [SerializeField]
-        private Transform healthBackground;
+        private RectTransform healthBackground;
 
         [SerializeField]
-        private Transform scalingGraphic;
-
-        private RectTransform _healthBackground;
-        private RectTransform _scalingGraphic;
+        private RectTransform scalingGraphic;
 
 
-        // Start is called before the first frame update
         void Start()
         {
-            _healthBackground = healthBackground.GetComponent<RectTransform>();
-            _scalingGraphic = scalingGraphic.GetComponent<RectTransform>();
             UpdateFillPercent(1);
         }
-
-        // Update is called once per frame
-        void Update() { }
 
         public void UpdateFillPercent(float percent)
         {
@@ -33,9 +24,8 @@ namespace Code.UI
                 percent = Math.Clamp(percent, 0, 1);
             }
 
-            float width = _healthBackground.rect.width * percent;
-            Rect rect = _scalingGraphic.rect;
-            _scalingGraphic.sizeDelta = new Vector2(width, rect.height);
+            float width = healthBackground.rect.width * percent;
+            scalingGraphic.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,width);
         }
     }
 }

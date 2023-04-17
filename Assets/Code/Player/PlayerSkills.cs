@@ -1,3 +1,4 @@
+using Code.Management;
 using Code.Player.Skills;
 using Code.Player.Skills.SkillSets;
 using Unity.Mathematics;
@@ -37,6 +38,7 @@ namespace Code.Player
         private void Start()
         {
             PlayerController.PlayerUpdate += SkillsUpdate;
+            myPlayerController = GameMaster.Instance.GetPlayer();
         }
 
         public void PressSkill(SkillSlot skillType)
@@ -48,7 +50,7 @@ namespace Code.Player
                 skills[index].Execute(myPlayerController);
                 skillStates[index] = SkillState.ACTIVE;
                 activeDurationRemaining[index] = skills[index].activeDuration;
-                cooldownRemaining[index] = activeDurationRemaining[index] + skills[index].cooldown;
+                cooldownRemaining[index] = skills[index].cooldown;
             }
         }
 
@@ -59,19 +61,19 @@ namespace Code.Player
                 switch (skillStates[i])
                 {
                     case SkillState.ACTIVE:
+                        activeDurationRemaining[i] = math.max(activeDurationRemaining[i] -= Time.deltaTime, 0.0f);
                         if (activeDurationRemaining[i] <= 0)
                         {
                             skillStates[i] = SkillState.COOLING;
                             skillSet.GetSkills()[i].Cleanup(playerController);
-                            activeDurationRemaining[i] = math.max(activeDurationRemaining[i] -= Time.deltaTime, 0.0f);
                         }
 
                         break;
                     case SkillState.COOLING:
+                        cooldownRemaining[i] = math.max(cooldownRemaining[i] -= Time.deltaTime, 0.0f);
                         if (cooldownRemaining[i] <= 0)
                         {
                             skillStates[i] = SkillState.READY;
-                            cooldownRemaining[i] = math.max(cooldownRemaining[i] -= Time.deltaTime, 0.0f);
                         }
 
                         break;
@@ -91,10 +93,10 @@ namespace Code.Player
 
         public float GetTimeUntilReadyToUse(SkillSlot skillType)
         {
-            return math.max(cooldownRemaining[(int)skillType] - Time.time, 0.0f);
+            return math.max(activeDurationRemaining[(int)skillType]+cooldownRemaining[(int)skillType], 0.0f);
         }
 
-        public float GetFractionOfCoolingDownProgress(SkillSlot skillType)
+        public float GetCooldownRemaining(SkillSlot skillType)
         {
             switch (GetStateOfSkill(skillType))
             {

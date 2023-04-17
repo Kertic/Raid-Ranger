@@ -48,6 +48,11 @@ namespace Code.Management
             Time.timeScale = 1;
         }
 
+        private void Start()
+        {
+            pauseMenu.SetActive(IsPaused);
+        }
+
         private void FixedUpdate()
         {
             if (IsPaused)

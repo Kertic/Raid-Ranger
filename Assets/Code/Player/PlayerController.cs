@@ -109,7 +109,7 @@ namespace Code.Player
                         skillIcons[i].SetTimeRemaining(Skills.GetActiveTimeRemaining(skillSlot)).SetOverlayPercent(0);
                         break;
                     case PlayerSkills.SkillState.COOLING:
-                        skillIcons[i].SetTimeRemaining(Skills.GetTimeUntilReadyToUse(skillSlot)).SetOverlayPercent(Skills.GetFractionOfCoolingDownProgress(skillSlot));
+                        skillIcons[i].SetTimeRemaining(Skills.GetTimeUntilReadyToUse(skillSlot)).SetOverlayPercent(Skills.GetCooldownRemaining(skillSlot));
                         break;
                 }
             }
