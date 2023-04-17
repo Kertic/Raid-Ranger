@@ -8,7 +8,7 @@ namespace Code.Enemy
 {
     public class Enemy : MonoBehaviour, IEntity
     {
-        [Header("Classes")] [SerializeField] protected FloatingHealthBar myHealth;
+        [Header("Classes")] [SerializeField] protected RectTransformHealthBar myHealth;
 
         [Header("EnemyVariables")] [SerializeField]
         private int maxHealth;
@@ -45,7 +45,7 @@ namespace Code.Enemy
             _currentHealth -= Math.Min(_currentHealth, damage);
             if (myHealth != null)
             {
-                myHealth.UpdateHealthPercent((float)_currentHealth / (float)maxHealth);
+                myHealth.UpdateFillPercent(_currentHealth / (float)maxHealth);
             }
         }
     }

@@ -11,6 +11,7 @@ using UnityEngine;
 namespace Code.Player
 {
     public delegate void PlayerEvent(PlayerController playerController);
+
     public class PlayerController : MonoBehaviour, IEntity
     {
         #region DebugVars
@@ -22,18 +23,21 @@ namespace Code.Player
 #endif
 
         #endregion
-        
+
         #region Events
+
         /// <summary>
         /// This will be invoked each time the PlayerController invokes FixedUpdate
         /// </summary>
         public static event PlayerEvent PlayerFixedUpdate;
+
         /// <summary>
         /// This will not be invoked when the game is paused 
         /// </summary>
         public static event PlayerEvent PlayerUpdate;
+
         #endregion
-        
+
         [Header("Classes")]
         [SerializeField]
         private Weapon weapon;
@@ -43,9 +47,6 @@ namespace Code.Player
 
         [SerializeField]
         private PlayerSkills skills;
-
-        [SerializeField]
-        private FloatingHealthBar playerHealthBar;
 
         [SerializeField]
         private RectTransformHealthBar rectHealthBar;
@@ -114,9 +115,14 @@ namespace Code.Player
                 }
             }
 
-            if (Input.GetButton("Fire1"))
+            if (Input.GetButtonDown("Fire1"))
             {
                 weapon.Attack(this);
+            }
+
+            if (Input.GetButtonDown("Fire2"))
+            {
+                weapon.SecondaryAttack(this);
             }
 
             if (Input.GetButtonDown("PrimarySkill"))
@@ -222,7 +228,6 @@ namespace Code.Player
             if (_redFlashTimeRemaining <= 0)
             {
                 _currentHealth -= Math.Min(_currentHealth, damage);
-                playerHealthBar.UpdateHealthPercent(_currentHealth / (float)maxHealth);
                 rectHealthBar.UpdateFillPercent(_currentHealth / (float)maxHealth);
                 _redFlashTimeRemaining = redFlashDuration;
                 _animator.SetTrigger(Damaged);

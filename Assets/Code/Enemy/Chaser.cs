@@ -2,27 +2,28 @@ using System;
 using Code.Management;
 using Code.Player;
 using Code.UI;
-using Interfaces;
 using UnityEngine;
-using UnityEngine.Networking.PlayerConnection;
 
 namespace Code.Enemy
 {
     public class Chaser : Enemy
     {
-        [Header("ExtraChaserClasses")] [SerializeField]
-        private FloatingHealthBar aggroBar;
+        [Header("ExtraChaserClasses")]
+        [SerializeField]
+        private RectTransformHealthBar rectAggroBar;
 
-        [SerializeField] private FloatingChatBox chatBox;
+        [SerializeField]
+        private FloatingChatBox chatBox;
 
-        [SerializeField] [Header("ChaserVariables")]
+        [SerializeField]
+        [Header("ChaserVariables")]
         private int touchDamage;
 
-        [SerializeField] 
-
+        [SerializeField]
         private float maxAggro, percentToHealBossOnTouch;
 
-        [SerializeField] private float aggroCooldownRate, moveSpeed;
+        [SerializeField]
+        private float aggroCooldownRate, moveSpeed;
 
         private PlayerController _player;
         private float _aggro;
@@ -44,7 +45,7 @@ namespace Code.Enemy
                 _aggro -= aggroCooldownRate * Time.deltaTime;
 
                 MoveToPlayer();
-                aggroBar.UpdateHealthPercent((_aggro / maxAggro));
+                rectAggroBar.UpdateFillPercent((_aggro / maxAggro));
             }
             else
             {

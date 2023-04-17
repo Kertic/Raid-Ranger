@@ -1,38 +1,31 @@
 using Unity.Mathematics;
 using UnityEngine;
 
-public class TimingBar : MonoBehaviour
+namespace Code.UI
 {
-    [SerializeField]
-    private GameObject cursor;
-
-    [SerializeField]
-    private RectTransform barBackground, timingWindow;
-
-    private void Start() { }
-
-    // Update is called once per frame
-    void Update() { }
-
-    public void SetCursorPercentage(float percent)
+    public class TimingBar : MonoBehaviour
     {
-        float backgroundLeft = barBackground.rect.min.x;
-        float backgroundRight = barBackground.rect.max.x;
-        float cursorX = math.lerp(backgroundLeft, backgroundRight, percent);
-        Vector3 newPos = cursor.transform.position;
-        newPos.x = cursorX;
-        cursor.transform.position = newPos;
-    }
+        [SerializeField]
+        private RectTransform barBackground, timingWindow, cursor;
 
-    public void SetTimingWindow(float beginningPercent, float endPercent)
-    {
-        float backgroundLeft = barBackground.rect.min.x;
-        float backgroundRight = barBackground.rect.max.x;
-        Vector2 offsetMin = timingWindow.offsetMin;
-        Vector2 offsetMax = timingWindow.offsetMax;
-        offsetMin.x = math.lerp(backgroundLeft, backgroundRight, beginningPercent);
-        offsetMax.x = math.lerp(backgroundLeft, backgroundRight, endPercent);
-        timingWindow.offsetMin = offsetMin;
-        timingWindow.offsetMax = offsetMax;
+        public void SetCursorPercentage(float percent)
+        {
+            Rect rect = barBackground.rect;
+            float leftBound = barBackground.localPosition.x - (barBackground.rect.width / 2.0f);
+            float rightBound = barBackground.localPosition.x + (barBackground.rect.width / 2.0f);
+            Vector3 newPos = cursor.localPosition;
+            newPos.x = math.lerp(leftBound, rightBound, percent);
+            cursor.localPosition = newPos;
+        }
+
+        public void SetTimingWindow(float beginningPercent, float endPercent)
+        {
+            Vector2 offsetMin = timingWindow.offsetMin;
+            Vector2 offsetMax = timingWindow.offsetMax;
+            offsetMin.x = math.lerp(0, barBackground.rect.width, beginningPercent);
+            offsetMax.x = math.lerp(barBackground.rect.width, 0, endPercent) * -1.0f;
+            timingWindow.offsetMin = offsetMin;
+            timingWindow.offsetMax = offsetMax;
+        }
     }
 }

@@ -1,7 +1,10 @@
 using System;
 using Code.Objects;
+using Code.UI;
+using Code.UI.Weapons;
 using Unity.Mathematics;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Code.Player.Weapons
 {
@@ -17,13 +20,17 @@ namespace Code.Player.Weapons
 
         [SerializeField]
         private TimingBar timingBar;
+
         [SerializeField]
-        private float cooldown, shootingMoveSpeedModifier, perfectReloadDuration;
+        private BulletLauncherClipUI clipUI;
+
+        [SerializeField]
+        private float cooldown, shootingMoveSpeedModifier, perfectReloadDuration, totalReloadTime;
 
         [SerializeField]
         private int maxBullets;
 
-        private float _cooldownHeat, _reloadDuration;
+        private float _cooldownHeat, _reloadDurationRemaining, _earliestPerfectReload, _latestPerfectReload;
         private int _bulletCount;
         private GunState _gunState;
 
@@ -57,6 +64,7 @@ namespace Code.Player.Weapons
 
                     break;
                 case GunState.EMPTY:
+                    Reload();
                     break;
                 case GunState.RELOADING:
                     Reload();
@@ -64,6 +72,8 @@ namespace Code.Player.Weapons
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            clipUI.SetAmmoRemaining(_bulletCount);
         }
 
         public override void SecondaryAttack(PlayerController playerController)
@@ -88,17 +98,57 @@ namespace Code.Player.Weapons
                 }
             }
 
-            if (_reloadDuration > 0)
+            if (_gunState == GunState.RELOADING)
             {
-                _reloadDuration -= math.max(Time.deltaTime, 0);
-                if (_reloadDuration == 0.0f)
+                if (_reloadDurationRemaining > 0)
                 {
-                    ChangeState(GunState.READY);
+                    _reloadDurationRemaining -= math.max(Time.deltaTime, 0);
+                    timingBar.SetCursorPercentage(1.0f - (_reloadDurationRemaining / totalReloadTime));
+                    if (_reloadDurationRemaining <= 0.0f)
+                    {
+                        Reload();
+                    }
                 }
             }
         }
 
-        private void Reload() { }
+        private void Reload()
+        {
+            switch (_gunState)
+            {
+                case GunState.READY:
+                case GunState.EMPTY:
+                    _reloadDurationRemaining = totalReloadTime;
+                    ChangeState(GunState.RELOADING);
+                    break;
+                case GunState.RELOADING:
+                    if (Time.time >= _earliestPerfectReload && Time.time <= _latestPerfectReload)
+                    {
+                        PerfectReload();
+                    }
+                    else
+                    {
+                        Debug.Log("Failed Perfect Reload");
+                        timingBar.SetTimingWindow(0, 0);
+                    }
+
+                    _earliestPerfectReload = 0;
+                    _latestPerfectReload = 0;
+
+                    if (_reloadDurationRemaining <= 0.0f)
+                    {
+                        ChangeState(GunState.READY);
+                    }
+
+                    break;
+            }
+        }
+
+        private void PerfectReload()
+        {
+            Debug.Log("This means Perfectly reloaded");
+            ChangeState(GunState.READY);
+        }
 
         private void ChangeState(GunState newState)
         {
@@ -107,14 +157,23 @@ namespace Code.Player.Weapons
             {
                 case GunState.READY:
                     _bulletCount = maxBullets;
+                    timingBar.SetTimingWindow(0, 0);
+                    timingBar.SetCursorPercentage(0);
                     break;
                 case GunState.EMPTY:
                     break;
                 case GunState.RELOADING:
+                    float beginning = Random.Range(0.4f, 0.8f);
+                    float end = (perfectReloadDuration / totalReloadTime) + beginning;
+                    timingBar.SetTimingWindow(beginning, end);
+                    _earliestPerfectReload = Time.time + (totalReloadTime * beginning);
+                    _latestPerfectReload = Time.time + (totalReloadTime * end);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
             }
+
+            clipUI.SetAmmoRemaining(_bulletCount);
         }
     }
 }
