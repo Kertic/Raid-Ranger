@@ -7,17 +7,35 @@ using UnityEngine.SceneManagement;
 
 namespace Code.Management
 {
+    public delegate void GameMasterEvent();
+
     public class GameMaster : MonoBehaviour
     {
-        [SerializeField] private float arenaExtents;
-        [SerializeField] private PlayerController player;
-        [SerializeField] private float bossTimer;
-        [SerializeField] private RectTransformHealthBar timerBar;
-        [SerializeField] private int environmentDamage;
-        [SerializeField] private GameObject deathScreen;
+        [SerializeField]
+        private float arenaExtents;
+
+        [SerializeField]
+        private PlayerController player;
+
+        [SerializeField]
+        private float bossTimer;
+
+        [SerializeField]
+        private RectTransformHealthBar timerBar;
+
+        [SerializeField]
+        private int environmentDamage;
+
+        [SerializeField]
+        private GameObject deathScreen, pauseMenu;
+
         private float _elapsedTime;
+        public bool IsPaused { get; private set; }
 
         public static GameMaster Instance;
+        public static event GameMasterEvent GameMasterFixedUpdate;
+        public static event GameMasterEvent GameMasterUpdate;
+        public static event GameMasterEvent GameMasterUnpausedUpdate;
 
         void Awake()
         {
@@ -32,6 +50,12 @@ namespace Code.Management
 
         private void FixedUpdate()
         {
+            if (IsPaused)
+            {
+                GameMasterFixedUpdate?.Invoke();
+                return;
+            }
+
             _elapsedTime += Time.deltaTime;
             if (_elapsedTime >= bossTimer)
             {
@@ -44,6 +68,22 @@ namespace Code.Management
             if (distanceFromCenter > arenaExtents)
             {
                 PlayerOutOfBounds();
+            }
+
+            GameMasterFixedUpdate?.Invoke();
+        }
+
+        private void Update()
+        {
+            if (Input.GetButtonDown("Cancel"))
+            {
+                Pause();
+            }
+
+            GameMasterUpdate?.Invoke();
+            if (!IsPaused)
+            {
+                GameMasterUnpausedUpdate?.Invoke();
             }
         }
 
@@ -71,7 +111,9 @@ namespace Code.Management
 
         public void Pause()
         {
-            Debug.Break();
+            IsPaused = !IsPaused;
+            pauseMenu.SetActive(IsPaused);
+            
         }
 
         private void OnDrawGizmosSelected()

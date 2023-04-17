@@ -1,5 +1,3 @@
-using System;
-using Code.Player.Interfaces;
 using Code.Player.Skills;
 using Code.Player.Skills.SkillSets;
 using Unity.Mathematics;
@@ -7,7 +5,7 @@ using UnityEngine;
 
 namespace Code.Player
 {
-    public class PlayerSkills : MonoBehaviour, IPlayerUpdatable
+    public class PlayerSkills : MonoBehaviour
     {
         public enum SkillSlot
         {
@@ -30,11 +28,16 @@ namespace Code.Player
         private SkillSet skillSet;
 
         [SerializeField]
-        private PlayerController playerController;
+        private PlayerController myPlayerController;
 
         private SkillState[] skillStates = new SkillState[(int)SkillSlot.NUMOFSKILLSLOTS];
-        private float[] timeWhenCoolingStarts = new float[(int)SkillSlot.NUMOFSKILLSLOTS];
-        private float[] timeWhenReadyAgain = new float[(int)SkillSlot.NUMOFSKILLSLOTS];
+        private float[] activeDurationRemaining = new float[(int)SkillSlot.NUMOFSKILLSLOTS];
+        private float[] cooldownRemaining = new float[(int)SkillSlot.NUMOFSKILLSLOTS];
+
+        private void Start()
+        {
+            PlayerController.PlayerUpdate += SkillsUpdate;
+        }
 
         public void PressSkill(SkillSlot skillType)
         {
@@ -42,31 +45,33 @@ namespace Code.Player
             int index = (int)skillType;
             if (skillStates[index] == SkillState.READY)
             {
-                skills[index].Execute(playerController);
+                skills[index].Execute(myPlayerController);
                 skillStates[index] = SkillState.ACTIVE;
-                timeWhenCoolingStarts[index] = Time.time + skills[index].activeDuration;
-                timeWhenReadyAgain[index] = timeWhenCoolingStarts[index] + skills[index].cooldown;
+                activeDurationRemaining[index] = skills[index].activeDuration;
+                cooldownRemaining[index] = activeDurationRemaining[index] + skills[index].cooldown;
             }
         }
 
-        public void PlayerFixedUpdate(PlayerController playerController)
+        public void SkillsUpdate(PlayerController playerController)
         {
             for (int i = 0; i < (int)SkillSlot.NUMOFSKILLSLOTS; i++)
             {
                 switch (skillStates[i])
                 {
                     case SkillState.ACTIVE:
-                        if (timeWhenCoolingStarts[i] <= Time.time)
+                        if (activeDurationRemaining[i] <= 0)
                         {
                             skillStates[i] = SkillState.COOLING;
                             skillSet.GetSkills()[i].Cleanup(playerController);
+                            activeDurationRemaining[i] = math.max(activeDurationRemaining[i] -= Time.deltaTime, 0.0f);
                         }
 
                         break;
                     case SkillState.COOLING:
-                        if (timeWhenReadyAgain[i] <= Time.time)
+                        if (cooldownRemaining[i] <= 0)
                         {
                             skillStates[i] = SkillState.READY;
+                            cooldownRemaining[i] = math.max(cooldownRemaining[i] -= Time.deltaTime, 0.0f);
                         }
 
                         break;
@@ -81,12 +86,12 @@ namespace Code.Player
 
         public float GetActiveTimeRemaining(SkillSlot skillType)
         {
-            return math.max(timeWhenCoolingStarts[(int)skillType] - Time.time, 0.0f);
+            return math.max(activeDurationRemaining[(int)skillType], 0.0f);
         }
 
         public float GetTimeUntilReadyToUse(SkillSlot skillType)
         {
-            return math.max(timeWhenReadyAgain[(int)skillType] - Time.time, 0.0f);
+            return math.max(cooldownRemaining[(int)skillType] - Time.time, 0.0f);
         }
 
         public float GetFractionOfCoolingDownProgress(SkillSlot skillType)

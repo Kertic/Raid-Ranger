@@ -10,6 +10,7 @@ using UnityEngine;
 
 namespace Code.Player
 {
+    public delegate void PlayerEvent(PlayerController playerController);
     public class PlayerController : MonoBehaviour, IEntity
     {
         #region DebugVars
@@ -21,7 +22,18 @@ namespace Code.Player
 #endif
 
         #endregion
-
+        
+        #region Events
+        /// <summary>
+        /// This will be invoked each time the PlayerController invokes FixedUpdate
+        /// </summary>
+        public static event PlayerEvent PlayerFixedUpdate;
+        /// <summary>
+        /// This will not be invoked when the game is paused 
+        /// </summary>
+        public static event PlayerEvent PlayerUpdate;
+        #endregion
+        
         [Header("Classes")]
         [SerializeField]
         private Weapon weapon;
@@ -34,6 +46,9 @@ namespace Code.Player
 
         [SerializeField]
         private FloatingHealthBar playerHealthBar;
+
+        [SerializeField]
+        private RectTransformHealthBar rectHealthBar;
 
         [SerializeField]
         private List<SkillIcon> skillIcons = new List<SkillIcon>();
@@ -59,9 +74,7 @@ namespace Code.Player
         public PlayerMovement PlayerMovement => playerMovement;
         public PlayerSkills Skills => skills;
         public Weapon Weapon => weapon;
-
         public List<SkillIcon> SkillIcons => skillIcons;
-
 
         private void Start()
         {
@@ -70,15 +83,16 @@ namespace Code.Player
             _startingMaxHealth = maxHealth;
             _startingAttackSpeed = attackSpeed;
             _animator = GetComponent<Animator>();
-            PlayerMovement.PlayerInitialize(this);
             for (int i = 0; i < skillIcons.Count; i++)
             {
                 PlayerSkills.SkillSlot skillSlot = (PlayerSkills.SkillSlot)i;
                 skillIcons[i].SetIconTexture(Skills.GetIcon(skillSlot));
             }
+
+            GameMaster.GameMasterUnpausedUpdate += PlayerControllerUpdate;
         }
 
-        private void Update()
+        private void PlayerControllerUpdate()
         {
             MouseWorldPosition = _camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, _camera.gameObject.transform.position.z * -1.0f));
 
@@ -140,13 +154,13 @@ namespace Code.Player
             {
                 _redFlashTimeRemaining -= Time.deltaTime;
             }
+
+            PlayerUpdate?.Invoke(this);
         }
 
         void FixedUpdate()
         {
-            playerMovement.PlayerFixedUpdate(this);
-            weapon.PlayerFixedUpdate(this);
-            skills.PlayerFixedUpdate(this);
+            PlayerFixedUpdate?.Invoke(this);
             DebugLogic();
         }
 
@@ -209,6 +223,7 @@ namespace Code.Player
             {
                 _currentHealth -= Math.Min(_currentHealth, damage);
                 playerHealthBar.UpdateHealthPercent(_currentHealth / (float)maxHealth);
+                rectHealthBar.UpdateFillPercent(_currentHealth / (float)maxHealth);
                 _redFlashTimeRemaining = redFlashDuration;
                 _animator.SetTrigger(Damaged);
                 if (_currentHealth == 0)

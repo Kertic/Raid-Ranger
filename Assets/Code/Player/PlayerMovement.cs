@@ -1,9 +1,8 @@
-using Code.Player.Interfaces;
 using UnityEngine;
 
 namespace Code.Player
 {
-    public class PlayerMovement : MonoBehaviour, IPlayerUpdatable, IPlayerInitializable
+    public class PlayerMovement : MonoBehaviour
     {
         public float InitialMoveSpeed { get; private set; }
         public Vector2 WalkingMovement => _walkingMovement;
@@ -18,17 +17,18 @@ namespace Code.Player
 
         private Vector2 _walkingMovement, _forcedMovement;
 
-        public void PlayerInitialize(PlayerController playerController)
+        private void Start()
         {
             InitialMoveSpeed = moveSpeed;
+            PlayerController.PlayerUpdate += PlayerMovementUpdate;
         }
 
         private void ApplyPhysics()
         {
             if (_forcedMovement != Vector2.zero)
             {
-                Vector2 forcedTravel = _forcedMovement.normalized * (_forcedMoveSpeed * Time.deltaTime);
-                Vector2 forcedTranslation = forcedTravel.magnitude >= _forcedMovement.magnitude ? _forcedMovement : forcedTravel;
+                Vector2 normalizedForcedMovement = _forcedMovement.normalized * (_forcedMoveSpeed * Time.deltaTime);
+                Vector2 forcedTranslation = normalizedForcedMovement.magnitude >= _forcedMovement.magnitude ? _forcedMovement : normalizedForcedMovement;
                 transform.position += (Vector3)forcedTranslation;
                 _forcedMovement -= forcedTranslation;
                 
@@ -80,7 +80,7 @@ namespace Code.Player
             Gizmos.DrawLine(position, position + (Vector3)_forcedMovement);
         }
 
-        public void PlayerFixedUpdate(PlayerController playerController)
+        public void PlayerMovementUpdate(PlayerController playerController)
         {
             ApplyPhysics();
         }

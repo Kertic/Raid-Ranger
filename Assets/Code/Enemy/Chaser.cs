@@ -33,14 +33,15 @@ namespace Code.Enemy
         {
             _player = GameMaster.Instance.GetPlayer();
             _aggro = maxAggro;
+            GameMaster.GameMasterUnpausedUpdate += ChaserUpdate;
         }
 
-        private void FixedUpdate()
+        private void ChaserUpdate()
         {
             if (_aggro > 0)
             {
                 chatBox.SetText("I'm gonna get you, Ranger!");
-                _aggro -= aggroCooldownRate;
+                _aggro -= aggroCooldownRate * Time.deltaTime;
 
                 MoveToPlayer();
                 aggroBar.UpdateHealthPercent((_aggro / maxAggro));
@@ -55,7 +56,7 @@ namespace Code.Enemy
 
         void MoveToPlayer()
         {
-            Vector3 direction = (_player.transform.position - transform.position).normalized;
+            Vector3 direction = (_player.transform.position - transform.position).normalized * Time.deltaTime;
             direction.z = 0;
             transform.Translate(direction * (moveSpeed));
             _lastMovementDirection = direction;
@@ -63,7 +64,7 @@ namespace Code.Enemy
 
         void MoveToBoss()
         {
-            Vector3 direction = (Vector3.zero - transform.position).normalized;
+            Vector3 direction = (Vector3.zero - transform.position).normalized * Time.deltaTime;
             transform.Translate(direction * (moveSpeed * 1.5f));
             _lastMovementDirection = direction;
         }
