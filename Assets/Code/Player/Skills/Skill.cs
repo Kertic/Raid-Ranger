@@ -10,6 +10,7 @@ namespace Code.Player.Skills
 
         public float cooldown;
         public float activeDuration;
+        public float castTime;
         public Sprite Icon => icon;
 
         public abstract void Execute(PlayerController playerController);

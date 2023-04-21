@@ -20,25 +20,22 @@ namespace Code.Player
         public enum SkillState
         {
             READY,
+            CASTING,
             ACTIVE,
             COOLING,
             NUMOFSTATES
         }
 
-        [SerializeField]
-        private SkillSet skillSet;
-
-        [SerializeField]
-        private PlayerController myPlayerController;
+        [SerializeField] private SkillSet skillSet;
 
         private SkillState[] skillStates = new SkillState[(int)SkillSlot.NUMOFSKILLSLOTS];
+        private float[] castTimeRemaining = new float[(int)SkillSlot.NUMOFSKILLSLOTS];
         private float[] activeDurationRemaining = new float[(int)SkillSlot.NUMOFSKILLSLOTS];
         private float[] cooldownRemaining = new float[(int)SkillSlot.NUMOFSKILLSLOTS];
 
         private void Start()
         {
             PlayerController.PlayerUpdate += SkillsUpdate;
-            myPlayerController = GameMaster.Instance.GetPlayer();
         }
 
         public void PressSkill(SkillSlot skillType)
@@ -47,9 +44,9 @@ namespace Code.Player
             int index = (int)skillType;
             if (skillStates[index] == SkillState.READY)
             {
-                skills[index].Execute(myPlayerController);
-                skillStates[index] = SkillState.ACTIVE;
-                activeDurationRemaining[index] = skills[index].activeDuration;
+                skillStates[index] = SkillState.CASTING;
+                castTimeRemaining[index] = skills[index].castTime;
+                activeDurationRemaining[index] = skills[index].activeDuration + castTimeRemaining[index];
                 cooldownRemaining[index] = skills[index].cooldown;
             }
         }
@@ -60,6 +57,15 @@ namespace Code.Player
             {
                 switch (skillStates[i])
                 {
+                    case SkillState.CASTING:
+                        castTimeRemaining[i] = math.max(castTimeRemaining[i] -= Time.deltaTime, 0.0f);
+                        if (castTimeRemaining[i] <= 0)
+                        {
+                            skillStates[i] = SkillState.ACTIVE;
+                            skillSet.GetSkills()[i].Execute(playerController);
+                        }
+
+                        break;
                     case SkillState.ACTIVE:
                         activeDurationRemaining[i] = math.max(activeDurationRemaining[i] -= Time.deltaTime, 0.0f);
                         if (activeDurationRemaining[i] <= 0)
@@ -93,7 +99,7 @@ namespace Code.Player
 
         public float GetTimeUntilReadyToUse(SkillSlot skillType)
         {
-            return math.max(activeDurationRemaining[(int)skillType]+cooldownRemaining[(int)skillType], 0.0f);
+            return math.max(activeDurationRemaining[(int)skillType] + cooldownRemaining[(int)skillType], 0.0f);
         }
 
         public float GetCooldownRemaining(SkillSlot skillType)
@@ -101,6 +107,7 @@ namespace Code.Player
             switch (GetStateOfSkill(skillType))
             {
                 case SkillState.READY:
+                case SkillState.CASTING:
                     return 0.0f;
                 case SkillState.ACTIVE:
                     return 1.0f;

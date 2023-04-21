@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Code.Player.Skills.Damage
+namespace Code.Player.Skills.Scripts.Damage
 {
     [CreateAssetMenu(fileName = "AttackSpeedAmp", menuName = "ScriptableObjects/Skill/AttackSpeedAmp", order = 1)]
     public class AttackSpeedAmp : Skill

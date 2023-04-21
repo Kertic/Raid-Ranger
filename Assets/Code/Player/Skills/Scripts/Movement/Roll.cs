@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Code.Player.Skills.Movement
+namespace Code.Player.Skills.Scripts.Movement
 {
     [CreateAssetMenu(fileName = "Roll", menuName = "ScriptableObjects/Skill/Roll", order = 1)]
     public class Roll : Skill

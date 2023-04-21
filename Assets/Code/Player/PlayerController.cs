@@ -6,7 +6,9 @@ using Code.Management;
 using Code.Player.Weapons;
 using Code.UI;
 using Interfaces;
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Code.Player
 {
@@ -36,36 +38,41 @@ namespace Code.Player
         /// </summary>
         public static event PlayerEvent PlayerUpdate;
 
+        public static event PlayerEvent PlayerHealthChanged;
+
         #endregion
 
-        [Header("Classes")]
-        [SerializeField]
-        private Weapon weapon;
+        [Header("Classes")] [SerializeField] private Weapon weapon;
 
-        [SerializeField]
-        private PlayerMovement playerMovement;
+        [SerializeField] private PlayerMovement playerMovement;
 
-        [SerializeField]
-        private PlayerSkills skills;
+        [SerializeField] private PlayerSkills skills;
 
-        [SerializeField]
-        private RectTransformHealthBar rectHealthBar;
+        [SerializeField] private RectTransformHealthBar rectHealthBar;
 
-        [SerializeField]
-        private List<SkillIcon> skillIcons = new List<SkillIcon>();
+        [SerializeField] private List<SkillIcon> skillIcons = new List<SkillIcon>();
 
-        [Header("PlayerStats")]
-        [SerializeField]
-        private int maxHealth;
+        [Header("PlayerStats")] [SerializeField]
+        private int maxHealth, currentHealth;
 
-        [SerializeField]
-        private float attackSpeed = 1.0f;
+        [SerializeField] private float attackSpeed = 1.0f;
 
-        [SerializeField]
-        private float redFlashDuration;
+        [SerializeField] private float redFlashDuration;
 
         private float _redFlashTimeRemaining, _startingAttackSpeed;
-        private int _startingMaxHealth, _currentHealth;
+        private int _startingMaxHealth;
+
+        public int CurrentHealth
+        {
+            get => currentHealth;
+             set
+            {
+                currentHealth = math.clamp(value,0, maxHealth);
+                PlayerHealthChanged?.Invoke(this);
+                rectHealthBar.UpdateFillPercent(CurrentHealth / (float)maxHealth);
+            }
+        }
+
         private Camera _camera;
         private Animator _animator;
         private static readonly int Damaged = Animator.StringToHash("Damaged");
@@ -80,7 +87,7 @@ namespace Code.Player
         private void Start()
         {
             _camera = Camera.main;
-            _currentHealth = maxHealth;
+            CurrentHealth = maxHealth;
             _startingMaxHealth = maxHealth;
             _startingAttackSpeed = attackSpeed;
             _animator = GetComponent<Animator>();
@@ -95,7 +102,8 @@ namespace Code.Player
 
         private void PlayerControllerUpdate()
         {
-            MouseWorldPosition = _camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, _camera.gameObject.transform.position.z * -1.0f));
+            MouseWorldPosition = _camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y,
+                _camera.gameObject.transform.position.z * -1.0f));
 
             for (int i = 0; i < skillIcons.Count; i++)
             {
@@ -110,7 +118,8 @@ namespace Code.Player
                         skillIcons[i].SetTimeRemaining(Skills.GetActiveTimeRemaining(skillSlot)).SetOverlayPercent(0);
                         break;
                     case PlayerSkills.SkillState.COOLING:
-                        skillIcons[i].SetTimeRemaining(Skills.GetTimeUntilReadyToUse(skillSlot)).SetOverlayPercent(Skills.GetCooldownRemaining(skillSlot));
+                        skillIcons[i].SetTimeRemaining(Skills.GetTimeUntilReadyToUse(skillSlot))
+                            .SetOverlayPercent(Skills.GetCooldownRemaining(skillSlot));
                         break;
                 }
             }
@@ -133,6 +142,11 @@ namespace Code.Player
             if (Input.GetButtonDown("MovementSkill"))
             {
                 skills.PressSkill(PlayerSkills.SkillSlot.UTILITY);
+            }
+
+            if (Input.GetButtonDown("SecondarySkill"))
+            {
+                skills.PressSkill(PlayerSkills.SkillSlot.SECONDARY);
             }
 
             PlayerMovement.StopWalking();
@@ -205,7 +219,7 @@ namespace Code.Player
 
         int IEntity.GetCurrentHealth()
         {
-            return _currentHealth;
+            return CurrentHealth;
         }
 
         int IEntity.GetMaxHealth()
@@ -227,11 +241,10 @@ namespace Code.Player
         {
             if (_redFlashTimeRemaining <= 0)
             {
-                _currentHealth -= Math.Min(_currentHealth, damage);
-                rectHealthBar.UpdateFillPercent(_currentHealth / (float)maxHealth);
+                CurrentHealth -= Math.Min(CurrentHealth, damage);
                 _redFlashTimeRemaining = redFlashDuration;
                 _animator.SetTrigger(Damaged);
-                if (_currentHealth == 0)
+                if (CurrentHealth == 0)
                 {
                     GameMaster.Instance.Death();
                 }

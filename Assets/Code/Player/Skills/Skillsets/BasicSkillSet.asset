@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: BasicSkillSet
   m_EditorClassIdentifier: 
   primarySkill: {fileID: 11400000, guid: aafca3c45da5d574a8340a5176db595a, type: 2}
-  secondarySkill: {fileID: 0}
+  secondarySkill: {fileID: 11400000, guid: 2a3928668579c8748bbf842a29bdfec7, type: 2}
   movementSkill: {fileID: 11400000, guid: 01293cf13f0b8b446ab66070b62044e1, type: 2}
   ultimateSkill: {fileID: 0}
