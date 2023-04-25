@@ -13,7 +13,8 @@ namespace Code.Player.Skills
         public float castTime;
         public Sprite Icon => icon;
 
-        public abstract void Execute(PlayerController playerController);
-        public abstract void Cleanup(PlayerController playerController);
+        public abstract void OnCastStart(PlayerController playerController);
+        public abstract void OnCastFinish(PlayerController playerController);
+        public abstract void OnActiveEnd(PlayerController playerController);
     }
 }

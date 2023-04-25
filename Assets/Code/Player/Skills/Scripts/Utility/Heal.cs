@@ -1,3 +1,4 @@
+using Code.Player.Weapons;
 using UnityEngine;
 
 namespace Code.Player.Skills.Scripts.Utility
@@ -7,14 +8,22 @@ namespace Code.Player.Skills.Scripts.Utility
     {
         [SerializeField] private int healAmount;
         [SerializeField] private float healWalkspeedMultiplier;
-        public override void Execute(PlayerController playerController)
+        public override void OnCastStart(PlayerController playerController)
         {
-            playerController.Weapon.SecondaryAttack(playerController);
-            playerController.CurrentHealth += healAmount;
             playerController.PlayerMovement.SetMovementSpeed(healWalkspeedMultiplier);
+            Weapon weap = playerController.Weapon;
+            if (weap.GetType() == typeof(BulletLauncher))
+            {
+                ((BulletLauncher)weap).BulletCount = 0;
+            }
         }
 
-        public override void Cleanup(PlayerController playerController)
+        public override void OnCastFinish(PlayerController playerController)
+        {
+            playerController.CurrentHealth += healAmount;
+        }
+
+        public override void OnActiveEnd(PlayerController playerController)
         {
             playerController.PlayerMovement.ResetMovementSpeed();
         }

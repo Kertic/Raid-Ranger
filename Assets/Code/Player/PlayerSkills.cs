@@ -26,15 +26,22 @@ namespace Code.Player
             NUMOFSTATES
         }
 
-        [SerializeField] private SkillSet skillSet;
+        [SerializeField]
+        private SkillSet skillSet;
 
         private SkillState[] skillStates = new SkillState[(int)SkillSlot.NUMOFSKILLSLOTS];
         private float[] castTimeRemaining = new float[(int)SkillSlot.NUMOFSKILLSLOTS];
         private float[] activeDurationRemaining = new float[(int)SkillSlot.NUMOFSKILLSLOTS];
         private float[] cooldownRemaining = new float[(int)SkillSlot.NUMOFSKILLSLOTS];
+        private bool[] shouldBeginCast = new bool[(int)SkillSlot.NUMOFSKILLSLOTS];
 
         private void Start()
         {
+            for (int i = 0; i < shouldBeginCast.Length; i++)
+            {
+                shouldBeginCast[i] = false;
+            }
+
             PlayerController.PlayerUpdate += SkillsUpdate;
         }
 
@@ -45,8 +52,9 @@ namespace Code.Player
             if (skillStates[index] == SkillState.READY)
             {
                 skillStates[index] = SkillState.CASTING;
+                shouldBeginCast[index] = true;
                 castTimeRemaining[index] = skills[index].castTime;
-                activeDurationRemaining[index] = skills[index].activeDuration + castTimeRemaining[index];
+                activeDurationRemaining[index] = skills[index].activeDuration;
                 cooldownRemaining[index] = skills[index].cooldown;
             }
         }
@@ -58,11 +66,16 @@ namespace Code.Player
                 switch (skillStates[i])
                 {
                     case SkillState.CASTING:
+                        if (shouldBeginCast[i])
+                        {
+                            skillSet.GetSkills()[i].OnCastStart(playerController);
+                            shouldBeginCast[i] = false;
+                        }
                         castTimeRemaining[i] = math.max(castTimeRemaining[i] -= Time.deltaTime, 0.0f);
                         if (castTimeRemaining[i] <= 0)
                         {
                             skillStates[i] = SkillState.ACTIVE;
-                            skillSet.GetSkills()[i].Execute(playerController);
+                            skillSet.GetSkills()[i].OnCastFinish(playerController);
                         }
 
                         break;
@@ -71,7 +84,7 @@ namespace Code.Player
                         if (activeDurationRemaining[i] <= 0)
                         {
                             skillStates[i] = SkillState.COOLING;
-                            skillSet.GetSkills()[i].Cleanup(playerController);
+                            skillSet.GetSkills()[i].OnActiveEnd(playerController);
                         }
 
                         break;

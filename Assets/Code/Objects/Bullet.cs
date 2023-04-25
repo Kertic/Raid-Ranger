@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Code.Objects
@@ -23,6 +24,12 @@ namespace Code.Objects
         public int GetDamage()
         {
             return damage;
+        }
+
+        public void SetDamage(int newDamage)
+        {
+            damage = math.max(newDamage, 0);
+            Debug.Log("My new damage: " + damage);
         }
 
         public void Spawn(Vector2 startingDirection)

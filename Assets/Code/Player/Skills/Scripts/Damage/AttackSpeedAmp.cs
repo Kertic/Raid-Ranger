@@ -7,12 +7,17 @@ namespace Code.Player.Skills.Scripts.Damage
     {
         [SerializeField]
         private float attackSpeedMultiplier;
-        public override void Execute(PlayerController playerController)
+
+        public override void OnCastStart(PlayerController playerController)
+        {
+        }
+
+        public override void OnCastFinish(PlayerController playerController)
         {
             playerController.MultiplyAttackSpeed(attackSpeedMultiplier);
         }
 
-        public override void Cleanup(PlayerController playerController)
+        public override void OnActiveEnd(PlayerController playerController)
         {
             playerController.ResetAttackSpeed();
         }

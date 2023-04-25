@@ -8,7 +8,11 @@ namespace Code.Player.Skills.Scripts.Movement
         [SerializeField]
         private float dashSpeed;
 
-        public override void Execute(PlayerController playerController)
+        public override void OnCastStart(PlayerController playerController)
+        {
+        }
+
+        public override void OnCastFinish(PlayerController playerController)
         {
             Vector3 position = playerController.transform.position;
             Vector3 destinationDirection = playerController.PlayerMovement.WalkingMovement;
@@ -16,6 +20,6 @@ namespace Code.Player.Skills.Scripts.Movement
             playerController.PlayerMovement.TravelToPoint(destinationPoint + position, 1.0f / dashSpeed);
         }
 
-        public override void Cleanup(PlayerController playerController) { }
+        public override void OnActiveEnd(PlayerController playerController) { }
     }
 }

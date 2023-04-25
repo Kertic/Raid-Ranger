@@ -17,6 +17,6 @@ public class MainMenu : MonoBehaviour
 
     public void StartGame()
     {
-        SceneManager.LoadScene("ImpBoss");
+        SceneManager.LoadScene("ImpBoss",LoadSceneMode.Single);
     }
 }

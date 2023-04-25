@@ -25,7 +25,7 @@ namespace Code.Player.Weapons
         private BulletLauncherClipUI clipUI;
 
         [SerializeField]
-        private float cooldown, shootingMoveSpeedModifier, perfectReloadDuration, totalReloadTime;
+        private float cooldown, shootingMoveSpeedModifier, perfectReloadDuration, totalReloadTime, snipeBulletDamageModifier;
 
         [SerializeField]
         private int maxBullets;
@@ -37,10 +37,20 @@ namespace Code.Player.Weapons
         [SerializeField]
         private GameObject bulletPrefab; //TODO: Refactor this into an object pool instead of instantiating them all dynamically 
 
+        public int BulletCount
+        {
+            get => _bulletCount;
+            set
+            {
+                _bulletCount = math.max(0, value);
+                clipUI.SetAmmoRemaining(BulletCount);
+            }
+        }
+
         private void Start()
         {
             _cooldownHeat = 0;
-            _bulletCount = maxBullets;
+            BulletCount = maxBullets;
             ChangeState(GunState.READY);
             PlayerController.PlayerUpdate += BulletLauncherUpdate;
         }
@@ -50,16 +60,19 @@ namespace Code.Player.Weapons
             switch (_gunState)
             {
                 case GunState.READY:
-                    if (_cooldownHeat > 0) return;
-                    Vector3 position = playerController.transform.position;
-                    Vector3 direction = playerController.MouseWorldPosition - position;
-                    Bullet launchedBullet = Instantiate(bulletPrefab.GetComponent<Bullet>(), position, Quaternion.identity);
-                    launchedBullet.Spawn(direction);
-                    _cooldownHeat = cooldown * (1.0f / playerController.AttackSpeed);
-                    _bulletCount -= 1;
-                    if (_bulletCount <= 0)
+                    if (BulletCount > 0)
+                    {
+                        if (_cooldownHeat <= 0)
+                        {
+                            LaunchBullet(playerController);
+                            _cooldownHeat = cooldown * (1.0f / playerController.AttackSpeed);
+                            BulletCount -= 1;
+                        }
+                    }
+                    else
                     {
                         ChangeState(GunState.EMPTY);
+                        Reload();
                     }
 
                     break;
@@ -69,17 +82,19 @@ namespace Code.Player.Weapons
                 case GunState.RELOADING:
                     Reload();
                     break;
+                case GunState.NUMOFSTATES:
                 default:
                     throw new ArgumentOutOfRangeException();
             }
 
-            clipUI.SetAmmoRemaining(_bulletCount);
+            clipUI.SetAmmoRemaining(BulletCount);
         }
 
         public override void SecondaryAttack(PlayerController playerController)
         {
             Reload();
         }
+
 
         public override void BulletLauncherUpdate(PlayerController playerController)
         {
@@ -110,6 +125,34 @@ namespace Code.Player.Weapons
                     }
                 }
             }
+        }
+
+        public bool Snipe(PlayerController playerController)
+        {
+            switch (_gunState)
+            {
+                case GunState.READY:
+                    Bullet launchedBullet = LaunchBullet(playerController);
+                    launchedBullet.SetDamage((int)(launchedBullet.GetDamage() * snipeBulletDamageModifier) * BulletCount);
+                    BulletCount = 0;
+                    Reload();
+                    return true;
+                case GunState.EMPTY:
+                    return false;
+                case GunState.RELOADING:
+                    return false;
+            }
+
+            return false;
+        }
+
+        private Bullet LaunchBullet(PlayerController playerController)
+        {
+            Vector3 position = playerController.transform.position;
+            Vector3 direction = playerController.MouseWorldPosition - position;
+            Bullet launchedBullet = Instantiate(bulletPrefab.GetComponent<Bullet>(), position, Quaternion.identity);
+            launchedBullet.Spawn(direction);
+            return launchedBullet;
         }
 
         private void Reload()
@@ -156,7 +199,7 @@ namespace Code.Player.Weapons
             switch (newState)
             {
                 case GunState.READY:
-                    _bulletCount = maxBullets;
+                    BulletCount = maxBullets;
                     timingBar.SetTimingWindow(0, 0);
                     timingBar.SetCursorPercentage(0);
                     break;
@@ -173,7 +216,7 @@ namespace Code.Player.Weapons
                     throw new ArgumentOutOfRangeException(nameof(newState), newState, null);
             }
 
-            clipUI.SetAmmoRemaining(_bulletCount);
+            clipUI.SetAmmoRemaining(BulletCount);
         }
     }
 }
